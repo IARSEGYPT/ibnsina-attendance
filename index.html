@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance — Essentials of Management, Planning &amp; Organizational Effectiveness</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{
+  --ink:#10192E; --ink-soft:#3B4661; --paper:#F3F4F7; --card:#FFFFFF; --line:#E2E4EA;
+  --brass:#B9903F; --brass-deep:#8F6C28;
+  --good:#2F7A56; --good-bg:#E6F2EC; --warn:#B9903F; --warn-bg:#FBF3E3; --bad:#B0392B; --bad-bg:#FBEAE7;
+  --radius:14px; --shadow: 0 1px 2px rgba(16,25,46,0.04), 0 8px 24px rgba(16,25,46,0.06);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;min-height:100vh;}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+h1,h2,h3{font-family:'Fraunces',serif;margin:0;letter-spacing:-0.01em;}
+a{color:inherit;}
+button{font-family:'Inter',sans-serif;cursor:pointer;}
+::selection{background:#D9C48A;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:6px 0 22px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:12px;}
+.brand-mark{width:46px;height:46px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--line);flex:none;color:#fff;font-family:'Fraunces',serif;font-weight:700;font-size:16px;}
+.brand-text h1{font-size:20px;font-weight:600;}
+.brand-text span{font-size:12px;color:var(--ink-soft);letter-spacing:.03em;text-transform:uppercase;}
+
+.tabs{display:flex;gap:6px;background:var(--card);padding:5px;border-radius:12px;border:1px solid var(--line);}
+.tab{padding:9px 16px;border:none;background:transparent;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink-soft);}
+.tab.active{background:var(--ink);color:#fff;}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);}
+.pad{padding:22px;}
+
+.grid-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+@media (max-width:820px){.grid-summary{grid-template-columns:repeat(2,1fr);}}
+.stat{padding:18px 18px;}
+.stat .n{font-family:'Fraunces',serif;font-size:30px;font-weight:600;line-height:1;}
+.stat .l{font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-top:6px;}
+
+.table-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);border-bottom:1px solid var(--line);padding:10px 12px;white-space:nowrap;}
+tbody td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle;white-space:nowrap;}
+tbody tr:hover{background:#FAFAFB;}
+.name-cell{font-weight:600;white-space:normal;min-width:200px;}
+.day-cell{text-align:center;font-size:15px;}
+.day-cell .yes{color:var(--good);font-weight:700;}
+.day-cell .no{color:var(--line);}
+.course-group-label{font-size:10.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;}
+.status-pill{padding:4px 11px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap;}
+.status-pill.pass{background:var(--good-bg);color:var(--good);}
+.status-pill.risk{background:var(--warn-bg);color:var(--brass-deep);}
+.overall-pct{font-family:'IBM Plex Mono',monospace;font-weight:700;}
+
+select, input[type=text]{font-family:'Inter',sans-serif;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;font-size:14px;color:var(--ink);}
+.btn{padding:10px 16px;border-radius:9px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-size:13.5px;font-weight:600;}
+.btn.secondary{background:#fff;color:var(--ink);}
+.btn.ghost{background:transparent;border-color:var(--line);color:var(--ink-soft);}
+.btn.danger{background:#fff;border-color:var(--bad);color:var(--bad);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.row-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;}
+.search-box{flex:1;min-width:180px;}
+
+.list-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+.list-row:last-child{border-bottom:none;}
+.list-idx{font-family:'IBM Plex Mono',monospace;color:var(--brass-deep);font-size:12px;width:26px;flex:none;}
+.list-name{font-weight:600;flex:1;min-width:200px;border:1px solid transparent;background:transparent;padding:6px 8px;border-radius:8px;}
+.list-name:focus{border-color:var(--line);background:#fff;}
+.day-select-inline{padding:7px 10px;border-radius:8px;border:1px solid var(--line);font-size:13px;}
+
+.checkin-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(circle at 50% 0%, #1C2A4A 0%, #0D1526 65%);}
+.checkin-card{max-width:440px;width:100%;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 30px 70px rgba(0,0,0,.4);}
+.checkin-head{background:linear-gradient(155deg,var(--ink), #24345C);color:#fff;padding:30px 26px 24px;text-align:center;}
+.checkin-head .eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass);margin-bottom:10px;}
+.checkin-head h2{font-size:21px;font-weight:600;line-height:1.3;}
+.checkin-mark{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-family:'Fraunces',serif;font-weight:700;font-size:16px;}
+.checkin-body{padding:26px;}
+.field-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:8px;display:block;}
+.field-gap{margin-bottom:18px;}
+.checkin-body select, .checkin-body input{width:100%;padding:13px 14px;font-size:15px;}
+.confirm-btn{width:100%;padding:15px;font-size:15px;margin-top:6px;border-radius:11px;}
+.result-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:30px;}
+.result-icon.ok{background:var(--good-bg);color:var(--good);}
+.result-icon.warn{background:var(--warn-bg);color:var(--brass-deep);}
+.result-icon.err{background:var(--bad-bg);color:var(--bad);}
+.result-title{text-align:center;font-family:'Fraunces',serif;font-size:20px;font-weight:600;margin-bottom:6px;}
+.result-sub{text-align:center;color:var(--ink-soft);font-size:14px;line-height:1.5;}
+.progress-track{height:8px;background:#EEF0F5;border-radius:20px;overflow:hidden;margin:18px 0 6px;}
+.progress-fill{height:100%;background:var(--good);border-radius:20px;transition:width .5s;}
+.pin-note{font-size:12px;color:var(--ink-soft);margin-top:10px;text-align:center;}
+.footer-note{font-size:12px;color:var(--ink-soft);text-align:center;margin-top:26px;line-height:1.6;}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:20px 22px 4px;flex-wrap:wrap;gap:10px;}
+.qr-panel{padding:30px;text-align:center;}
+.qr-panel .qr-frame{border:8px solid var(--ink);border-radius:16px;display:inline-block;padding:14px;background:#fff;}
+.qr-link-box{font-size:12.5px;color:var(--ink-soft);word-break:break-all;background:var(--paper);padding:10px 12px;border-radius:8px;margin:14px auto 0;max-width:420px;}
+.coord-link{position:fixed;bottom:14px;right:16px;font-size:11px;color:rgba(255,255,255,.45);text-decoration:none;}
+.coord-link:hover{color:rgba(255,255,255,.8);}
+.retry-btn{margin-top:14px;}
+.err-detail{font-size:11px;color:var(--ink-soft);margin-top:14px;background:var(--paper);padding:8px 10px;border-radius:8px;word-break:break-word;}
+.empty-note{padding:26px 22px;color:var(--ink-soft);font-size:14px;text-align:center;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ============================================================
+   Essentials of Management, Planning & Organizational
+   Effectiveness — Attendance System (built from scratch)
+   Flow: scan QR -> pick course -> pick name -> Sign In
+   Program runs 3 days per course. 80% attendance required.
+   ============================================================ */
+
+const PROGRAM_NAME = "Essentials of Management, Planning & Organizational Effectiveness";
+const PASS_THRESHOLD = 0.8;
+const SESSION_DAYS = 3;
+const DEFAULT_ADMIN_PIN = "1234";
+const BRAND_MARK = `<div class="checkin-mark">EM</div>`;
+
+/* Starting roster — admin can add/remove people at any time from the Learners tab */
+const SEED_LEARNERS = [
+  "Haitham Salah Eldeen Mokhtar Sayed Ahmed","Nader Ahmed Mahmoud Elashry",
+  "Abd Elhafez Ragab Abd Elhafez Ahmed","Mohamed Abdo Mohamed Lotfy Abd Elaziz",
+  "Ahmed Shokry Abd Elqader Mohamed","Ahmed Mahmoud Mohamed Kharouba",
+  "Waled Ahmed Refat AbdAllah","Mohamed Elsayed Mohamed Mohamed Yousef",
+  "Ibrahim Mohamed Mohamed Ibrahim","Ahmed Mahmoud Mostafa Soliman",
+  "Atia Mohamed Atia Mahboub Saied","Medhat Youssef Mikhail Samaan",
+  "Hamdy Mahmoud Ibrahim Makaty","Khaled Mostafa Ali Mostafa Elian",
+  "Mohamed Adel Abd Elhaleem Eissa","Mohamed Ibrahim Saied Ibrahim",
+  "Michel Samir Lotfy Yousef","Kareem Abdelhamid Abdelfattah Abdelmeged Elshafea",
+  "Ahmed Besheir Hamoud Mahmoud Sherief"
+].map((name,i)=>({id:"L"+(i+1), name}));
+
+/* Start with no courses — the admin builds the course list from scratch */
+const SEED_COURSES = [];
+
+/* ---------------- BACKEND (JSONBin) ----------------
+   Keys are namespaced with "empoe_" so this system's data never
+   collides with any other attendance tracker sharing the same bin. */
+const JSONBIN_ID = "6a4e1a54da38895dfe3f7fb8";
+const JSONBIN_KEY = "$2a$10$6JzXAzHmKEUL2WTi/Dh6F.ThHEpSZnZoPVaYBPLdHKREY3FyIEhMi";
+const JSONBIN_BASE = "https://api.jsonbin.io/v3/b/" + JSONBIN_ID;
+const K_LEARNERS = "empoe_learners", K_COURSES = "empoe_courses", K_ATTENDANCE = "empoe_attendance", K_PIN = "empoe_admin_pin", K_DEVICES = "empoe_devices";
+const DEVICE_ID_KEY = "empoe_device_id";
+
+/* Persistent per-browser device fingerprint. Stored in localStorage so it
+   survives reloads — this is what ties a physical phone to one learner. */
+function getOrCreateDeviceId(){
+  try{
+    let id = localStorage.getItem(DEVICE_ID_KEY);
+    if(!id){
+      id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : ("dev-"+Date.now()+"-"+Math.random().toString(36).slice(2));
+      localStorage.setItem(DEVICE_ID_KEY, id);
+    }
+    return id;
+  }catch(e){
+    // localStorage unavailable (private mode etc.) — fall back to a per-load id,
+    // which just means this device won't stay registered across reloads.
+    return "dev-"+Date.now()+"-"+Math.random().toString(36).slice(2);
+  }
+}
+
+function withTimeout(promise, ms=12000){
+  return Promise.race([
+    promise,
+    new Promise((_, reject)=> setTimeout(()=> reject(new Error("Timed out talking to the database.")), ms))
+  ]);
+}
+async function readBin(){
+  const res = await withTimeout(fetch(JSONBIN_BASE + "/latest", { headers: { "X-Master-Key": JSONBIN_KEY } }));
+  if(!res.ok){ const e = new Error("JSONBin read failed"); e.code = "http_"+res.status; throw e; }
+  const json = await res.json();
+  return json.record || {};
+}
+async function writeBin(record){
+  const res = await withTimeout(fetch(JSONBIN_BASE, {
+    method: "PUT",
+    headers: { "X-Master-Key": JSONBIN_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify(record)
+  }));
+  if(!res.ok){ const e = new Error("JSONBin write failed"); e.code = "http_"+res.status; throw e; }
+  return true;
+}
+
+async function ensureSeeded(){
+  const record = await readBin();
+  let changed = false;
+  if(!record[K_LEARNERS]){ record[K_LEARNERS] = SEED_LEARNERS; changed = true; }
+  if(!record[K_COURSES]){ record[K_COURSES] = SEED_COURSES; changed = true; }
+  if(!record[K_ATTENDANCE]){ record[K_ATTENDANCE] = {}; changed = true; }
+  if(!record[K_DEVICES]){ record[K_DEVICES] = {}; changed = true; }
+  record[K_COURSES].forEach(c=>{ if(c.currentDay === undefined){ c.currentDay = 1; changed = true; } });
+  if(changed) await writeBin(record);
+  return {learners: record[K_LEARNERS], courses: record[K_COURSES], devices: record[K_DEVICES]};
+}
+
+async function getAdminPin(){
+  const record = await readBin();
+  return record[K_PIN] || DEFAULT_ADMIN_PIN;
+}
+async function setAdminPin(newPin){
+  const record = await readBin();
+  record[K_PIN] = newPin;
+  await writeBin(record);
+}
+
+/* ---------------- LEARNERS ---------------- */
+async function addLearner(name){
+  const record = await readBin();
+  if(!record[K_LEARNERS]) record[K_LEARNERS] = [];
+  const id = "L" + Date.now();
+  record[K_LEARNERS].push({id, name});
+  await writeBin(record);
+  return record[K_LEARNERS];
+}
+async function removeLearner(learnerId){
+  const record = await readBin();
+  record[K_LEARNERS] = (record[K_LEARNERS]||[]).filter(l=>l.id!==learnerId);
+  await writeBin(record);
+  return record[K_LEARNERS];
+}
+async function renameLearner(learnerId, name){
+  const record = await readBin();
+  const l = (record[K_LEARNERS]||[]).find(x=>x.id===learnerId);
+  if(l) l.name = name;
+  await writeBin(record);
+  return record[K_LEARNERS];
+}
+
+/* ---------------- COURSES ---------------- */
+async function addCourse(name){
+  const record = await readBin();
+  if(!record[K_COURSES]) record[K_COURSES] = [];
+  const id = "C" + Date.now();
+  record[K_COURSES].push({id, name, currentDay:1});
+  await writeBin(record);
+  return record[K_COURSES];
+}
+async function removeCourse(courseId){
+  const record = await readBin();
+  record[K_COURSES] = (record[K_COURSES]||[]).filter(c=>c.id!==courseId);
+  await writeBin(record);
+  return record[K_COURSES];
+}
+async function renameCourse(courseId, name){
+  const record = await readBin();
+  const c = (record[K_COURSES]||[]).find(x=>x.id===courseId);
+  if(c) c.name = name;
+  await writeBin(record);
+  return record[K_COURSES];
+}
+async function setCourseDay(courseId, day){
+  const record = await readBin();
+  const c = (record[K_COURSES]||[]).find(x=>x.id===courseId);
+  if(c) c.currentDay = day;
+  await writeBin(record);
+  return record[K_COURSES];
+}
+
+/* ---------------- ATTENDANCE ----------------
+   stored as fields keyed by courseId_learnerId -> {day1,day2,day3: isoTimestamp|null} */
+function attDocId(courseId, learnerId){ return courseId+"_"+learnerId; }
+
+async function recordAttendance(courseId, learnerId, dayNum){
+  const field = "day"+dayNum;
+  const record = await readBin();
+  if(!record[K_ATTENDANCE]) record[K_ATTENDANCE] = {};
+  const id = attDocId(courseId, learnerId);
+  const before = record[K_ATTENDANCE][id] || {};
+  const already = !!before[field];
+  if(!already){
+    record[K_ATTENDANCE][id] = { ...before, courseId, learnerId, [field]: new Date().toISOString() };
+    await writeBin(record);
+  }
+  const after = record[K_ATTENDANCE][id] || before;
+  return {ok:true, already, rec: {day1: after.day1||null, day2: after.day2||null, day3: after.day3||null}};
+}
+
+async function getAllAttendance(){
+  const record = await readBin();
+  const map = {}; // learnerId -> courseId -> {day1,day2,day3}
+  for(const id in (record[K_ATTENDANCE] || {})){
+    const d = record[K_ATTENDANCE][id];
+    if(!map[d.learnerId]) map[d.learnerId] = {};
+    map[d.learnerId][d.courseId] = {day1:d.day1||null, day2:d.day2||null, day3:d.day3||null};
+  }
+  return map;
+}
+
+async function deleteAllAttendance(){
+  const record = await readBin();
+  record[K_ATTENDANCE] = {};
+  await writeBin(record);
+}
+
+/* ---------------- DEVICE LOCK ----------------
+   Maps deviceId -> learnerId. Once a device has checked a learner in,
+   that device can only ever check that same learner in — this stops
+   one phone being used to sign in for several people. */
+async function getDevices(){
+  const record = await readBin();
+  return record[K_DEVICES] || {};
+}
+function findDeviceForLearner(devices, learnerId){
+  return Object.keys(devices).find(k=>devices[k]===learnerId) || null;
+}
+async function bindDevice(deviceId, learnerId){
+  const record = await readBin();
+  if(!record[K_DEVICES]) record[K_DEVICES] = {};
+  record[K_DEVICES][deviceId] = learnerId;
+  await writeBin(record);
+  return record[K_DEVICES];
+}
+/* Admin-only: frees up whichever device is currently locked to this
+   learner (e.g. they lost/replaced their phone). */
+async function resetLearnerDevice(learnerId){
+  const record = await readBin();
+  const devices = record[K_DEVICES] || {};
+  Object.keys(devices).forEach(k=>{ if(devices[k]===learnerId) delete devices[k]; });
+  record[K_DEVICES] = devices;
+  await writeBin(record);
+  return devices;
+}
+async function resetAllDevices(){
+  const record = await readBin();
+  record[K_DEVICES] = {};
+  await writeBin(record);
+}
+
+/* ---------------- STATS ---------------- */
+function daysAttended(rec){ return rec ? (rec.day1?1:0)+(rec.day2?1:0)+(rec.day3?1:0) : 0; }
+function learnerStats(attByCourse, totalCourses){
+  let count = 0;
+  for(const c in attByCourse){ count += daysAttended(attByCourse[c]); }
+  const totalDays = totalCourses * SESSION_DAYS;
+  const pct = totalDays ? Math.round((count/totalDays)*100) : 0;
+  const pass = totalDays ? (count/totalDays) >= PASS_THRESHOLD : false;
+  return {count, total: totalDays, pct, pass};
+}
+
+/* ---------------- CONNECTION ERROR SCREEN ---------------- */
+function showConnectionError(err, retryFn){
+  const app = document.getElementById("app");
+  const code = err && err.code || "";
+  const isAuth = code === "http_401" || code === "http_403";
+  const isNotFound = code === "http_404";
+  let sub = "Couldn't reach the database. Check your internet connection and try again.";
+  if(isAuth) sub = "The database rejected the request (unauthorized). A coordinator needs to check the JSONBin API key in the app's code.";
+  if(isNotFound) sub = "The database bin wasn't found. A coordinator needs to check the JSONBin Bin ID in the app's code.";
+  app.innerHTML = `<div class="checkin-wrap"><div class="checkin-card" style="max-width:420px;">
+    <div class="checkin-head">${BRAND_MARK}<div class="eyebrow">Attendance</div><h2>Can't reach the database</h2></div>
+    <div class="checkin-body">
+      <div class="result-icon err">✕</div>
+      <div class="result-title">Connection failed</div>
+      <div class="result-sub">${sub}</div>
+      <button class="btn confirm-btn retry-btn" id="retry-btn">Try again</button>
+      <div class="err-detail mono">${(err && (err.code || err.message)) || "Unknown error"}</div>
+    </div>
+  </div></div>`;
+  document.getElementById("retry-btn").onclick = retryFn;
+}
+
+/* ---------------- ROUTER ---------------- */
+const params = new URLSearchParams(window.location.search);
+if(params.get("admin") === "1"){ renderAdmin(); } else { renderCheckin(); }
+
+/* ================= CHECK-IN VIEW ================= */
+async function renderCheckin(){
+  const app = document.getElementById("app");
+  app.innerHTML = `<div class="checkin-wrap"><div class="checkin-card" id="ci-card">
+    <div class="checkin-head">${BRAND_MARK}<div class="eyebrow">Attendance</div><h2>Loading…</h2></div>
+    <div class="checkin-body"></div></div>
+    <a href="?admin=1" class="coord-link">Coordinator sign-in</a></div>`;
+
+  let learners, courses, devices;
+  try{
+    ({learners, courses, devices} = await ensureSeeded());
+  }catch(err){
+    showConnectionError(err, renderCheckin);
+    return;
+  }
+
+  const card = document.getElementById("ci-card");
+  card.querySelector(".checkin-head h2").textContent = "Sign in to attendance";
+
+  if(!courses.length){
+    card.querySelector(".checkin-body").innerHTML = `<div class="empty-note">No courses are open for check-in yet. Ask your coordinator to add one.</div>`;
+    return;
+  }
+
+  const deviceId = getOrCreateDeviceId();
+  const lockedLearnerId = devices[deviceId] || null;
+  const lockedLearner = lockedLearnerId ? learners.find(l=>l.id===lockedLearnerId) : null;
+
+  const courseOptions = `<option value="">Choose a course…</option>${courses.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}`;
+
+  if(lockedLearner){
+    /* This device already belongs to a specific learner — no name picker,
+       so nobody else can use this phone to sign in as someone else. */
+    card.querySelector(".checkin-body").innerHTML = `
+      <div class="field-gap">
+        <label class="field-label">Course</label>
+        <select id="course-select">${courseOptions}</select>
+      </div>
+      <div class="field-gap">
+        <label class="field-label">Signing in as</label>
+        <div class="qr-link-box" style="text-align:left;margin:0;">${lockedLearner.name}</div>
+      </div>
+      <button class="btn confirm-btn" id="signin-btn" disabled>Sign In</button>
+      <div class="footer-note">${PROGRAM_NAME}<br>Not you? Ask your coordinator to reset this device.</div>
+    `;
+    const courseSel = document.getElementById("course-select");
+    const signinBtn = document.getElementById("signin-btn");
+    courseSel.onchange = ()=>{ signinBtn.disabled = !courseSel.value; };
+
+    signinBtn.onclick = async ()=>{
+      const course = courses.find(c=>c.id===courseSel.value);
+      if(!course) return;
+      signinBtn.disabled = true;
+      signinBtn.textContent = "Signing in…";
+      try{
+        const dayNum = course.currentDay || 1;
+        const result = await recordAttendance(course.id, lockedLearner.id, dayNum);
+        renderCheckinResult(card, lockedLearner, course, dayNum, result.already, result.rec, false);
+      }catch(err){
+        showConnectionError(err, renderCheckin);
+      }
+    };
+    return;
+  }
+
+  /* Unregistered device — learner picks their name once. The select stays a
+     normal closed dropdown (not an always-open list) so names aren't on
+     display for anyone nearby; typing narrows it down first. */
+  const sortedLearners = [...learners].sort((a,b)=>a.name.localeCompare(b.name));
+
+  card.querySelector(".checkin-body").innerHTML = `
+    <div class="field-gap">
+      <label class="field-label">Course</label>
+      <select id="course-select">${courseOptions}</select>
+    </div>
+    <div class="field-gap">
+      <label class="field-label">Your name</label>
+      <input type="text" id="name-filter" placeholder="Type to search…" style="margin-bottom:8px;" autocomplete="off">
+      <select id="name-select">
+        <option value="">Select your name…</option>
+        ${sortedLearners.map(l=>`<option value="${l.id}">${l.name}</option>`).join("")}
+      </select>
+    </div>
+    <div class="pin-note" id="lock-warning" style="display:none;color:var(--bad);"></div>
+    <button class="btn confirm-btn" id="signin-btn" disabled>Sign In</button>
+    <div class="footer-note">${PROGRAM_NAME}<br>First sign-in links this phone to your name.</div>
+  `;
+
+  const courseSel = document.getElementById("course-select");
+  const filterInput = document.getElementById("name-filter");
+  const nameSel = document.getElementById("name-select");
+  const signinBtn = document.getElementById("signin-btn");
+  const lockWarning = document.getElementById("lock-warning");
+
+  function refreshFilter(){
+    const q = filterInput.value.trim().toLowerCase();
+    const matches = sortedLearners.filter(l=>l.name.toLowerCase().includes(q));
+    nameSel.innerHTML = `<option value="">Select your name…</option>${matches.map(l=>`<option value="${l.id}">${l.name}</option>`).join("")}`;
+    updateBtn();
+  }
+  function updateBtn(){
+    lockWarning.style.display = "none";
+    signinBtn.disabled = !(courseSel.value && nameSel.value);
+  }
+  filterInput.oninput = refreshFilter;
+  courseSel.onchange = updateBtn;
+  nameSel.onchange = updateBtn;
+
+  signinBtn.onclick = async ()=>{
+    const course = courses.find(c=>c.id===courseSel.value);
+    const learner = learners.find(l=>l.id===nameSel.value);
+    if(!course || !learner) return;
+
+    /* Block if this learner is already locked to a different device —
+       stops the same person "attending" from two phones, and stops
+       someone else picking this learner's name on a fresh device. */
+    const existingDeviceId = findDeviceForLearner(devices, learner.id);
+    if(existingDeviceId && existingDeviceId !== deviceId){
+      lockWarning.textContent = `${learner.name} is already registered on another device. Ask your coordinator to reset it if you've switched phones.`;
+      lockWarning.style.display = "block";
+      return;
+    }
+
+    signinBtn.disabled = true;
+    signinBtn.textContent = "Signing in…";
+    try{
+      const dayNum = course.currentDay || 1;
+      const result = await recordAttendance(course.id, learner.id, dayNum);
+      await bindDevice(deviceId, learner.id);
+      renderCheckinResult(card, learner, course, dayNum, result.already, result.rec, true);
+    }catch(err){
+      showConnectionError(err, renderCheckin);
+    }
+  };
+}
+
+function renderCheckinResult(card, learner, course, dayNum, already, rec, justBound){
+  const attendedThisCourse = daysAttended(rec);
+  const pct = Math.round((attendedThisCourse/SESSION_DAYS)*100);
+  card.innerHTML = `
+    <div class="checkin-head">${BRAND_MARK}<div class="eyebrow">Attendance</div><h2>${course.name}</h2></div>
+    <div class="checkin-body">
+      <div class="result-icon ${already?'warn':'ok'}">${already?'!':'✓'}</div>
+      <div class="result-title">${already? "Already signed in" : "You're checked in!"}</div>
+      <div class="result-sub">${learner.name} — Day ${dayNum} of ${SESSION_DAYS}${already? " was already recorded." : " recorded just now."}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%;"></div></div>
+      <div class="pin-note">${attendedThisCourse} of ${SESSION_DAYS} days attended for this course</div>
+      ${justBound ? `<div class="pin-note">This phone is now linked to your name — it'll sign you in automatically next time.</div>` : ``}
+      <button class="btn secondary confirm-btn" id="another-btn">Done</button>
+    </div>
+  `;
+  document.getElementById("another-btn").onclick = renderCheckin;
+}
+
+/* ================= ADMIN VIEW ================= */
+function isAdminAuthed(){ return sessionStorage.getItem("empoe_admin_ok") === "1"; }
+function setAdminAuthed(){ sessionStorage.setItem("empoe_admin_ok", "1"); }
+
+async function renderAdmin(){
+  if(!isAdminAuthed()){ renderAdminLogin(); return; }
+  paintShell();
+}
+
+async function renderAdminLogin(){
+  const app = document.getElementById("app");
+  app.innerHTML = `<div class="checkin-wrap"><div class="checkin-card" style="max-width:380px;">
+    <div class="checkin-head">${BRAND_MARK}<div class="eyebrow">Attendance</div><h2>Coordinator sign-in</h2></div>
+    <div class="checkin-body">
+      <label class="field-label">Admin PIN</label>
+      <input type="text" id="admin-pin-input" placeholder="Enter PIN" autocomplete="off">
+      <button class="btn confirm-btn" id="admin-login-btn">Enter</button>
+      <div class="pin-note" id="admin-pin-error" style="color:var(--bad);display:none;">Incorrect PIN.</div>
+    </div>
+  </div></div>`;
+
+  const submit = async ()=>{
+    const entered = document.getElementById("admin-pin-input").value.trim();
+    let pin;
+    try{ pin = await getAdminPin(); }
+    catch(err){ showConnectionError(err, renderAdminLogin); return; }
+    if(entered && entered === pin){
+      setAdminAuthed();
+      paintShell();
+    }else{
+      document.getElementById("admin-pin-error").style.display = "block";
+    }
+  };
+  document.getElementById("admin-login-btn").onclick = submit;
+  document.getElementById("admin-pin-input").onkeydown = (e)=>{ if(e.key==="Enter") submit(); };
+  document.getElementById("admin-pin-input").focus();
+}
+
+const STATE = { activeTab: "dashboard", search: "" };
+
+async function paintShell(){
+  const app = document.getElementById("app");
+  app.innerHTML = `<div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">EM</div>
+        <div class="brand-text">
+          <h1>Attendance</h1>
+          <span>${PROGRAM_NAME}</span>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab ${STATE.activeTab==='dashboard'?'active':''}" data-tab="dashboard">Dashboard</button>
+        <button class="tab ${STATE.activeTab==='learners'?'active':''}" data-tab="learners">Learners</button>
+        <button class="tab ${STATE.activeTab==='courses'?'active':''}" data-tab="courses">Courses</button>
+        <button class="tab ${STATE.activeTab==='qr'?'active':''}" data-tab="qr">QR Code</button>
+        <button class="tab ${STATE.activeTab==='settings'?'active':''}" data-tab="settings">Settings</button>
+      </div>
+    </div>
+    <div id="tab-content"></div>
+  </div>`;
+
+  app.querySelectorAll(".tab").forEach(btn=>{
+    btn.onclick = ()=>{ STATE.activeTab = btn.dataset.tab; paintShell(); };
+  });
+
+  const content = document.getElementById("tab-content");
+  content.innerHTML = `<div class="card pad" style="text-align:center;color:var(--ink-soft);">Loading…</div>`;
+
+  let learners, courses, devices;
+  try{
+    ({learners, courses, devices} = await ensureSeeded());
+  }catch(err){
+    showConnectionError(err, paintShell);
+    return;
+  }
+
+  if(STATE.activeTab === "dashboard") paintDashboard(content, learners, courses);
+  else if(STATE.activeTab === "learners") paintLearners(content, learners, devices);
+  else if(STATE.activeTab === "courses") paintCourses(content, courses);
+  else if(STATE.activeTab === "qr") paintQr(content);
+  else if(STATE.activeTab === "settings") paintSettings(content);
+}
+
+/* ---- Dashboard ---- */
+async function paintDashboard(content, learners, courses){
+  let attendance;
+  try{ attendance = await getAllAttendance(); }
+  catch(err){ showConnectionError(err, paintShell); return; }
+
+  const totalSessions = courses.length * SESSION_DAYS;
+  const passCount = learners.filter(l=>learnerStats(attendance[l.id]||{}, courses.length).pass).length;
+
+  content.innerHTML = `
+    <div class="grid-summary">
+      <div class="card stat"><div class="n">${learners.length}</div><div class="l">Learners</div></div>
+      <div class="card stat"><div class="n">${courses.length}</div><div class="l">Courses</div></div>
+      <div class="card stat"><div class="n">${totalSessions}</div><div class="l">Total sessions (${SESSION_DAYS} days each)</div></div>
+      <div class="card stat"><div class="n">${passCount}/${learners.length}</div><div class="l">Meeting 80% attendance</div></div>
+    </div>
+    <div class="card">
+      <div class="section-head">
+        <h3 style="font-size:16px;">Attendance — ${courses.length} course${courses.length===1?'':'s'} × ${SESSION_DAYS} days</h3>
+      </div>
+      <div class="row-controls" style="padding:0 20px;">
+        <input type="text" class="search-box" id="dash-search" placeholder="Search learner…" value="${STATE.search}">
+      </div>
+      <div class="table-scroll" id="dash-table-wrap"></div>
+    </div>
+  `;
+
+  function renderTable(){
+    const q = STATE.search.trim().toLowerCase();
+    const rows = [...learners]
+      .filter(l=>l.name.toLowerCase().includes(q))
+      .sort((a,b)=>a.name.localeCompare(b.name));
+
+    if(!courses.length){
+      document.getElementById("dash-table-wrap").innerHTML = `<div class="empty-note">No courses yet — add one from the Courses tab.</div>`;
+      return;
+    }
+
+    const head1 = `<tr>
+      <th rowspan="2">Learner</th>
+      ${courses.map(c=>`<th colspan="${SESSION_DAYS}" style="text-align:center;">${c.name}</th>`).join("")}
+      <th rowspan="2">Overall</th>
+      <th rowspan="2">Status</th>
+    </tr>`;
+    const head2 = `<tr>
+      ${courses.map(()=> Array.from({length:SESSION_DAYS}, (_,i)=>`<th style="text-align:center;">D${i+1}</th>`).join("")).join("")}
+    </tr>`;
+
+    const bodyRows = rows.map(l=>{
+      const attByCourse = attendance[l.id] || {};
+      const stats = learnerStats(attByCourse, courses.length);
+      const cells = courses.map(c=>{
+        const rec = attByCourse[c.id] || {};
+        return Array.from({length:SESSION_DAYS}, (_,i)=>{
+          const attended = !!rec["day"+(i+1)];
+          return `<td class="day-cell">${attended?'<span class="yes">●</span>':'<span class="no">—</span>'}</td>`;
+        }).join("");
+      }).join("");
+      return `<tr>
+        <td class="name-cell">${l.name}</td>
+        ${cells}
+        <td class="overall-pct">${stats.count}/${stats.total} (${stats.pct}%)</td>
+        <td><span class="status-pill ${stats.pass?'pass':'risk'}">${stats.pass?'On track':'At risk'}</span></td>
+      </tr>`;
+    }).join("");
+
+    document.getElementById("dash-table-wrap").innerHTML = `<table><thead>${head1}${head2}</thead><tbody>${bodyRows || `<tr><td colspan="${courses.length*SESSION_DAYS+3}" style="text-align:center;color:var(--ink-soft);">No matching learners.</td></tr>`}</tbody></table>`;
+  }
+
+  document.getElementById("dash-search").oninput = (e)=>{ STATE.search = e.target.value; renderTable(); };
+  renderTable();
+}
+
+/* ---- Learners ---- */
+function paintLearners(content, learners, devices){
+  devices = devices || {};
+  content.innerHTML = `<div class="card">
+    <div class="section-head"><h3 style="font-size:16px;">Learners (${learners.length})</h3></div>
+    <p style="padding:0 20px;color:var(--ink-soft);font-size:13px;margin:0 0 14px;">
+      Each learner's phone locks to their name the first time they check in, so nobody can sign in on someone else's behalf. "Reset device" frees them up to register a new phone.
+    </p>
+    <div class="row-controls" style="padding:0 20px;">
+      <input type="text" id="new-learner-name" placeholder="Full name" style="flex:1;min-width:220px;">
+      <button class="btn" id="add-learner-btn">Add Learner</button>
+    </div>
+    <div id="learner-list"></div>
+  </div>`;
+
+  const sorted = [...learners].sort((a,b)=>a.name.localeCompare(b.name));
+  const list = document.getElementById("learner-list");
+  list.innerHTML = sorted.map((l,i)=>{
+    const locked = !!findDeviceForLearner(devices, l.id);
+    return `
+    <div class="list-row">
+      <span class="list-idx">${String(i+1).padStart(2,'0')}</span>
+      <input type="text" class="list-name" data-id="${l.id}" value="${l.name}">
+      <span class="status-pill ${locked?'pass':'risk'}" style="flex:none;">${locked?'Device registered':'No device yet'}</span>
+      ${locked?`<button class="btn ghost" data-reset="${l.id}">Reset device</button>`:``}
+      <button class="btn ghost" data-del="${l.id}">Remove</button>
+    </div>`;
+  }).join("") || `<div class="empty-note">No learners yet.</div>`;
+
+  list.querySelectorAll(".list-name").forEach(inp=>{
+    inp.onchange = async ()=>{
+      const v = inp.value.trim();
+      if(!v) return;
+      await renameLearner(inp.dataset.id, v);
+    };
+  });
+  list.querySelectorAll("[data-reset]").forEach(btn=>{
+    btn.onclick = async ()=>{
+      const l = learners.find(x=>x.id===btn.dataset.reset);
+      if(!confirm(`Reset the registered device for "${l.name}"? They'll be able to check in from a new phone next time, and their old phone will no longer sign them in automatically.`)) return;
+      await resetLearnerDevice(btn.dataset.reset);
+      paintShell();
+    };
+  });
+  list.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.onclick = async ()=>{
+      const l = learners.find(x=>x.id===btn.dataset.del);
+      if(!confirm(`Remove "${l.name}"? Their attendance history stays in the database but they'll no longer appear in the check-in list.`)) return;
+      await removeLearner(btn.dataset.del);
+      paintShell();
+    };
+  });
+
+  document.getElementById("add-learner-btn").onclick = async ()=>{
+    const input = document.getElementById("new-learner-name");
+    const name = input.value.trim();
+    if(!name){ input.style.borderColor = "var(--bad)"; return; }
+    await addLearner(name);
+    paintShell();
+  };
+}
+
+/* ---- Courses ---- */
+function paintCourses(content, courses){
+  content.innerHTML = `<div class="card">
+    <div class="section-head"><h3 style="font-size:16px;">Courses (${courses.length}) — each runs ${SESSION_DAYS} days, 80% attendance required</h3></div>
+    <p style="padding:0 20px;color:var(--ink-soft);font-size:13px;margin:0 0 14px;">Set "Current day" to whichever day of the course is happening today — learner check-ins are recorded to that day.</p>
+    <div class="row-controls" style="padding:0 20px;">
+      <input type="text" id="new-course-name" placeholder="New course name" style="flex:1;min-width:220px;">
+      <button class="btn" id="add-course-btn">Add Course</button>
+    </div>
+    <div id="course-list"></div>
+  </div>`;
+
+  const list = document.getElementById("course-list");
+  list.innerHTML = courses.map((c,i)=>`
+    <div class="list-row">
+      <span class="list-idx">${String(i+1).padStart(2,'0')}</span>
+      <input type="text" class="list-name" data-id="${c.id}" value="${c.name}">
+      <select class="day-select-inline" data-day="${c.id}">
+        ${Array.from({length:SESSION_DAYS},(_,i)=>i+1).map(d=>`<option value="${d}" ${c.currentDay===d?'selected':''}>Current day: Day ${d}</option>`).join("")}
+      </select>
+      <button class="btn ghost" data-del="${c.id}">Remove</button>
+    </div>
+  `).join("") || `<div class="empty-note">No courses yet — add the first one above.</div>`;
+
+  list.querySelectorAll(".list-name").forEach(inp=>{
+    inp.onchange = async ()=>{
+      const v = inp.value.trim();
+      if(!v) return;
+      await renameCourse(inp.dataset.id, v);
+    };
+  });
+  list.querySelectorAll("[data-day]").forEach(sel=>{
+    sel.onchange = async ()=>{ await setCourseDay(sel.dataset.day, Number(sel.value)); };
+  });
+  list.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.onclick = async ()=>{
+      const c = courses.find(x=>x.id===btn.dataset.del);
+      if(!confirm(`Remove "${c.name}"? Attendance history for this course stays in the database, but it'll disappear from the check-in list and dashboard.`)) return;
+      await removeCourse(btn.dataset.del);
+      paintShell();
+    };
+  });
+
+  document.getElementById("add-course-btn").onclick = async ()=>{
+    const input = document.getElementById("new-course-name");
+    const name = input.value.trim();
+    if(!name){ input.style.borderColor = "var(--bad)"; return; }
+    await addCourse(name);
+    paintShell();
+  };
+}
+
+/* ---- QR Code ---- */
+function paintQr(content){
+  const url = window.location.origin + window.location.pathname;
+  content.innerHTML = `<div class="card qr-panel">
+    <h3 style="font-size:16px;margin-bottom:4px;">Check-in QR Code</h3>
+    <p style="color:var(--ink-soft);font-size:13.5px;max-width:420px;margin:0 auto 16px;">
+      One code for every course and every day. Learners scan it, then pick the course and their name themselves.
+    </p>
+    <div id="qr-canvas" class="qr-frame"></div>
+    <div class="qr-link-box">${url}</div>
+    <div class="modal-actions" style="display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;">
+      <button class="btn secondary" id="qr-copy-btn">Copy Link</button>
+      <button class="btn" id="qr-print-btn">Print</button>
+    </div>
+  </div>`;
+
+  new QRCode(document.getElementById("qr-canvas"), { text: url, width: 220, height: 220, colorDark: "#10192E", colorLight: "#ffffff" });
+
+  document.getElementById("qr-copy-btn").onclick = ()=>{
+    navigator.clipboard.writeText(url).then(()=>{
+      const btn = document.getElementById("qr-copy-btn");
+      const old = btn.textContent; btn.textContent = "Copied!";
+      setTimeout(()=>{ btn.textContent = old; }, 1500);
+    });
+  };
+  document.getElementById("qr-print-btn").onclick = ()=> window.print();
+}
+
+/* ---- Settings ---- */
+function paintSettings(content){
+  content.innerHTML = `<div class="card pad">
+    <h3 style="font-size:16px;margin-bottom:16px;">Settings</h3>
+    <div class="row-controls">
+      <button class="btn secondary" id="change-pin-btn">Change Admin PIN</button>
+      <button class="btn secondary" id="reset-att-btn">Reset Attendance Only</button>
+      <button class="btn secondary" id="reset-devices-btn">Reset All Registered Devices</button>
+      <button class="btn danger" id="reset-all-btn">Full Reset</button>
+    </div>
+    <p style="color:var(--ink-soft);font-size:13px;margin-top:8px;">
+      "Reset Attendance Only" clears check-in records but keeps learners and courses.
+      "Reset All Registered Devices" unlocks every phone so all learners register fresh next check-in — useful at the start of a new cohort.
+      "Full Reset" wipes everything and restores the original starting roster with no courses.
+    </p>
+  </div>`;
+
+  document.getElementById("change-pin-btn").onclick = async ()=>{
+    const current = await getAdminPin();
+    const entered = prompt("Enter the current admin PIN:");
+    if(entered === null) return;
+    if(entered !== current){ alert("Incorrect current PIN. PIN was not changed."); return; }
+    const next = prompt("Enter the new admin PIN (share it only with coordinators):");
+    if(next === null) return;
+    const trimmed = next.trim();
+    if(!trimmed){ alert("PIN cannot be empty. PIN was not changed."); return; }
+    await setAdminPin(trimmed);
+    alert("PIN updated. Share the new PIN with your co-coordinators — the old PIN no longer works.");
+  };
+
+  document.getElementById("reset-att-btn").onclick = async ()=>{
+    if(!confirm("This clears every learner's check-ins for every course.\n\nLearners and courses are NOT changed.\n\nThis cannot be undone. Continue?")) return;
+    const btn = document.getElementById("reset-att-btn");
+    btn.disabled = true; btn.textContent = "Clearing…";
+    await deleteAllAttendance();
+    paintShell();
+  };
+
+  document.getElementById("reset-devices-btn").onclick = async ()=>{
+    if(!confirm("This unlocks every phone currently registered to a learner. Everyone will need to select their name again on their next check-in.\n\nContinue?")) return;
+    const btn = document.getElementById("reset-devices-btn");
+    btn.disabled = true; btn.textContent = "Clearing…";
+    await resetAllDevices();
+    paintShell();
+  };
+
+  document.getElementById("reset-all-btn").onclick = async ()=>{
+    if(!confirm("FULL RESET\n\nThis will permanently delete ALL learners, courses, and attendance records, and restore the original starting roster with no courses.\n\nThis cannot be undone. Continue?")) return;
+    const pin = await getAdminPin();
+    const check = prompt("Type the admin PIN again to confirm this full reset:");
+    if(check === null) return;
+    if(check !== pin){ alert("PIN didn't match — full reset cancelled. Nothing was changed."); return; }
+
+    const btn = document.getElementById("reset-all-btn");
+    btn.disabled = true; btn.textContent = "Resetting…";
+
+    const record = await readBin();
+    record[K_LEARNERS] = SEED_LEARNERS;
+    record[K_COURSES] = SEED_COURSES;
+    record[K_ATTENDANCE] = {};
+    record[K_DEVICES] = {};
+    await writeBin(record);
+
+    STATE.activeTab = "dashboard";
+    STATE.search = "";
+    paintShell();
+  };
+}
+</script>
+</body>
+</html>
